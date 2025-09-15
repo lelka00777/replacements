@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Планировщик смен</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+            padding: 0.5rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        #employees-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .employee-card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            padding: 0.75rem;
+        }
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+        .profile-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #3b82f6;
+        }
+        .profile-name {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+        .profile-position {
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+        .section-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-top: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+        .session-block {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .session-block .input-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .session-block input {
+            flex: 1;
+            padding: 0.4rem;
+            border-radius: 0.5rem;
+            border: 1px solid #d1d5db;
+            font-size: 0.8rem;
+        }
+        .session-block .remove-btn {
+            background-color: #ef4444;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+            line-height: 1;
+            font-size: 0.75rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        .session-block .main-inputs {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .session-block .main-inputs input {
+            flex: 1;
+        }
+        .btn-add, .btn-calculate {
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            font-size: 0.8rem;
+        }
+        .btn-add {
+            background-color: #e5e7eb;
+            color: #4b5563;
+        }
+        .btn-add:hover {
+            background-color: #d1d5db;
+        }
+        .btn-calculate {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .btn-calculate:hover {
+            background-color: #2563eb;
+        }
+        .results-section {
+            margin-top: 0.75rem;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 0.75rem;
+        }
+        .results-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .results-section li {
+            background-color: #f9fafb;
+            padding: 0.4rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.25rem;
+            font-size: 0.8rem;
+        }
+        .results-title-container {
+             display: flex;
+             justify-content: space-between;
+             align-items: center;
+             margin-bottom: 0.5rem;
+        }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal.open {
+            visibility: visible;
+            opacity: 1;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+        }
+        .modal-close-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .alert-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1001;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="text-xl font-bold text-center mb-4">Планировщик смен</h1>
+    <div id="employees-container">
+        <!-- Employee cards will be generated here -->
+    </div>
+    <div class="flex justify-center mt-4 gap-2">
+        <button id="add-employee-btn" class="btn-add">Добавить сотрудника</button>
+        <button id="clear-all-btn" class="btn-add">Очистить всё</button>
+    </div>
+</div>
+
+<div id="share-modal" class="modal">
+    <div class="modal-content">
+        <span class="modal-close-btn">&times;</span>
+        <h3 class="text-lg font-bold mb-4">Выберите способ отправки</h3>
+        <div class="flex flex-col gap-4">
+            <button id="share-image-btn" class="btn-add bg-blue-500 text-white">Поделиться как изображение</button>
+            <button id="share-text-btn" class="btn-add bg-blue-500 text-white">Поделиться как текст</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const employeesContainer = document.getElementById('employees-container');
+        const addEmployeeBtn = document.getElementById('add-employee-btn');
+        const clearAllBtn = document.getElementById('clear-all-btn');
+        const shareModal = document.getElementById('share-modal');
+        const shareImageBtn = document.getElementById('share-image-btn');
+        const shareTextBtn = document.getElementById('share-text-btn');
+        const modalCloseBtn = document.querySelector('.modal-close-btn');
+        let currentEmployeeIndex = null;
+
+        const savedData = localStorage.getItem('employeeSchedules');
+        let employeeData = savedData ? JSON.parse(savedData) : [];
+
+        if (employeeData.length === 0) {
+            employeeData = [
+                {
+                    name: "Влад",
+                    position: "Дверь",
+                    image: "https://placehold.co/120x120/E8D2FF/9400D3?text=Влад",
+                    sessions: [
+                        { start: "13:30", end: "15:00", replacement: "двери Влад" },
+                        { start: "15:30", end: "15:45", replacement: "двери Влад" },
+                        { start: "16:00", end: "16:45", replacement: "Сканы Ира" },
+                        { start: "17:00", end: "18:00", replacement: "двери Влад" },
+                        { start: "18:15", end: "19:00", replacement: "Ксюша Welcome" },
+                        { start: "20:30", end: "21:15", replacement: "Саша двери" },
+                    ]
+                },
+                {
+                    name: "Ксюша",
+                    position: "Welcome",
+                    image: "https://placehold.co/120x120/FFD2F5/A6428B?text=Ксюша",
+                    sessions: [
+                        { start: "13:30", end: "14:00", replacement: "двери" },
+                        { start: "14:00", end: "14:30", replacement: "Welcom" },
+                        { start: "15:00", end: "16:00", replacement: "Сканы" },
+                        { start: "16:45", end: "17:30", replacement: "welcom" },
+                        { start: "17:30", end: "18:15", replacement: "Почта" },
+                        { start: "19:00", end: "20:00", replacement: "Сканы" },
+                        { start: "20:00", end: "20:30", replacement: "welcom" },
+                    ]
+                }
+            ];
+        }
+
+        function renderEmployees() {
+            employeesContainer.innerHTML = '';
+            employeeData.forEach((employee, employeeIndex) => {
+                const card = document.createElement('div');
+                card.classList.add('employee-card');
+                card.id = `employee-card-${employeeIndex}`;
+
+                const profileHeader = `
+                    <div class="profile-header">
+                        <img src="${employee.image}" alt="Профиль ${employee.name}" class="profile-img">
+                        <div>
+                            <input type="text" value="${employee.name}" class="profile-name bg-transparent border-none focus:outline-none w-full" data-employee-index="${employeeIndex}" data-field="name">
+                            <input type="text" value="${employee.position}" class="profile-position bg-transparent border-none focus:outline-none w-full" data-employee-index="${employeeIndex}" data-field="position">
+                        </div>
+                    </div>
+                `;
+                card.innerHTML = profileHeader;
+
+                const scheduleSection = document.createElement('div');
+                scheduleSection.classList.add('schedule-section');
+
+                const sessionsTitle = document.createElement('h4');
+                sessionsTitle.classList.add('section-title');
+                sessionsTitle.textContent = "Рабочие сессии";
+                scheduleSection.appendChild(sessionsTitle);
+
+                const sessionsContainer = document.createElement('div');
+                sessionsContainer.id = `sessions-container-${employeeIndex}`;
+
+                employee.sessions.forEach((session, sessionIndex) => {
+                    const sessionBlock = createSessionBlock(employeeIndex, sessionIndex, session.start, session.end, session.replacement);
+                    sessionsContainer.appendChild(sessionBlock);
+                });
+                scheduleSection.appendChild(sessionsContainer);
+
+                const buttonsDiv = document.createElement('div');
+                buttonsDiv.classList.add('flex', 'gap-2', 'mt-2', 'mb-2');
+                const addSessionBtn = document.createElement('button');
+                addSessionBtn.classList.add('btn-add');
+                addSessionBtn.textContent = 'Добавить';
+                addSessionBtn.addEventListener('click', () => {
+                    employeeData[employeeIndex].sessions.push({ start: "", end: "", replacement: "" });
+                    saveDataAndRender();
+                });
+                buttonsDiv.appendChild(addSessionBtn);
+
+                const calculateBtn = document.createElement('button');
+                calculateBtn.classList.add('btn-calculate');
+                calculateBtn.textContent = 'Рассчитать';
+                calculateBtn.addEventListener('click', () => {
+                    saveData();
+                    calculateAndDisplay(employeeData[employeeIndex], employeeIndex);
+                });
+                buttonsDiv.appendChild(calculateBtn);
+
+                const shareBtn = document.createElement('button');
+                shareBtn.classList.add('btn-add', 'bg-blue-500', 'text-white');
+                shareBtn.textContent = 'Поделиться';
+                shareBtn.addEventListener('click', () => {
+                    currentEmployeeIndex = employeeIndex;
+                    shareModal.classList.add('open');
+                });
+                buttonsDiv.appendChild(shareBtn);
+
+                scheduleSection.appendChild(buttonsDiv);
+
+                const resultsSection = document.createElement('div');
+                resultsSection.id = `results-section-${employeeIndex}`;
+                resultsSection.classList.add('results-section');
+                scheduleSection.appendChild(resultsSection);
+
+                card.appendChild(scheduleSection);
+                employeesContainer.appendChild(card);
+                
+                calculateAndDisplay(employee, employeeIndex);
+            });
+
+            document.querySelectorAll('input[data-field]').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const empIdx = e.target.dataset.employeeIndex;
+                    const field = e.target.dataset.field;
+                    employeeData[empIdx][field] = e.target.value;
+                    saveDataAndRender();
+                });
+            });
+        }
+
+        function createSessionBlock(employeeIndex, sessionIndex, startValue, endValue, replacementValue) {
+            const sessionBlock = document.createElement('div');
+            sessionBlock.classList.add('session-block');
+            sessionBlock.innerHTML = `
+                <div class="input-group">
+                    <input type="time" class="session-start" value="${startValue || ""}" data-employee-index="${employeeIndex}" data-session-index="${sessionIndex}">
+                    <input type="time" class="session-end" value="${endValue || ""}" data-employee-index="${employeeIndex}" data-session-index="${sessionIndex}">
+                </div>
+                <div class="input-group">
+                    <input type="text" class="session-replacement" value="${replacementValue || ""}" placeholder="Заменяет..." data-employee-index="${employeeIndex}" data-session-index="${sessionIndex}">
+                    <button class="remove-btn" data-employee-index="${employeeIndex}" data-session-index="${sessionIndex}">X</button>
+                </div>
+            `;
+            const removeBtn = sessionBlock.querySelector('.remove-btn');
+            removeBtn.addEventListener('click', () => {
+                employeeData[employeeIndex].sessions.splice(sessionIndex, 1);
+                saveDataAndRender();
+            });
+
+            const inputs = sessionBlock.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const empIdx = e.target.dataset.employeeIndex;
+                    const sessIdx = e.target.dataset.sessionIndex;
+                    if (e.target.classList.contains('session-start')) {
+                        employeeData[empIdx].sessions[sessIdx].start = e.target.value;
+                    } else if (e.target.classList.contains('session-end')) {
+                        employeeData[empIdx].sessions[sessIdx].end = e.target.value;
+                    } else if (e.target.classList.contains('session-replacement')) {
+                        employeeData[empIdx].sessions[sessIdx].replacement = e.target.value;
+                    }
+                    saveDataAndRender();
+                });
+            });
+            return sessionBlock;
+        }
+
+        function calculateAndDisplay(employee, employeeIndex) {
+            const resultsSection = document.getElementById(`results-section-${employeeIndex}`);
+            const workStart = new Date(`2000-01-01T09:45:00`);
+            const workEnd = new Date(`2000-01-01T22:45:00`);
+
+            let totalWorkMinutes = 0;
+            let totalBreakMinutes = 0;
+            const breakDetails = [];
+            const workDetails = [];
+            
+            const sortedSessions = [...employee.sessions].filter(s => s.start && s.end).sort((a, b) => {
+                return a.start.localeCompare(b.start);
+            });
+
+            // Calculate work and break minutes between sessions
+            sortedSessions.forEach((session, index) => {
+                const start = new Date(`2000-01-01T${session.start}:00`);
+                const end = new Date(`2000-01-01T${session.end}:00`);
+                
+                const workMinutes = (end - start) / (1000 * 60);
+                if (workMinutes > 0) {
+                    totalWorkMinutes += workMinutes;
+                    workDetails.push({ start: session.start, end: session.end, duration: workMinutes, replacement: session.replacement });
+                }
+
+                if (index > 0) {
+                    const prevEnd = new Date(`2000-01-01T${sortedSessions[index - 1].end}:00`);
+                    const breakMinutes = (start - prevEnd) / (1000 * 60);
+                    if (breakMinutes > 0) {
+                        breakDetails.push({
+                            start: sortedSessions[index - 1].end,
+                            end: session.start,
+                            duration: breakMinutes
+                        });
+                    }
+                }
+            });
+
+            // Calculate free time before first session and after last session
+            if (sortedSessions.length > 0) {
+                const firstSessionStart = new Date(`2000-01-01T${sortedSessions[0].start}:00`);
+                const lastSessionEnd = new Date(`2000-01-01T${sortedSessions[sortedSessions.length - 1].end}:00`);
+
+                if (firstSessionStart > workStart) {
+                    const beforeWorkBreak = (firstSessionStart - workStart) / (1000 * 60);
+                    if (beforeWorkBreak > 0) {
+                         breakDetails.push({
+                            start: "09:45",
+                            end: sortedSessions[0].start,
+                            duration: beforeWorkBreak
+                         });
+                    }
+                }
+
+                if (lastSessionEnd < workEnd) {
+                    const afterWorkBreak = (workEnd - lastSessionEnd) / (1000 * 60);
+                    if (afterWorkBreak > 0) {
+                        breakDetails.push({
+                            start: sortedSessions[sortedSessions.length - 1].end,
+                            end: "22:45",
+                            duration: afterWorkBreak
+                        });
+                    }
+                }
+            } else {
+                 const fullBreak = (workEnd - workStart) / (1000 * 60);
+                 if (fullBreak > 0) {
+                     breakDetails.push({
+                         start: "09:45",
+                         end: "22:45",
+                         duration: fullBreak
+                     });
+                 }
+            }
+
+            // Calculate total break minutes from all break details
+            totalBreakMinutes = breakDetails.reduce((sum, b) => sum + b.duration, 0);
+
+            resultsSection.innerHTML = `
+                <div class="results-title-container">
+                    <h4 class="section-title">Занято:</h4>
+                    <span>${totalWorkMinutes} мин</span>
+                </div>
+                <ul>
+                    ${workDetails.map(d => `<li>${d.start} - ${d.end} / ${d.replacement}</li>`).join('')}
+                </ul>
+                
+                <div class="results-title-container">
+                    <h4 class="section-title">Свободно:</h4>
+                    <span>${totalBreakMinutes} мин</span>
+                </div>
+                <ul>
+                    ${breakDetails.sort((a, b) => a.start.localeCompare(b.start)).map(b => `<li>${b.start} - ${b.end} (${b.duration} мин)</li>`).join('')}
+                </ul>
+            `;
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem('employeeSchedules', JSON.stringify(employeeData));
+            } catch (e) {
+                console.error('Failed to save data:', e);
+            }
+        }
+
+        function saveDataAndRender() {
+            saveData();
+            renderEmployees();
+        }
+        
+        function showCustomAlert(message) {
+            const alertPopup = document.createElement('div');
+            alertPopup.className = 'alert-popup';
+            alertPopup.innerHTML = `
+                <p>${message}</p>
+                <button onclick="this.parentNode.remove()" style="padding: 8px 16px; margin-top: 15px; border-radius: 5px; border: 1px solid #ccc; cursor: pointer;">ОК</button>
+            `;
+            document.body.appendChild(alertPopup);
+        }
+
+        function shareAsImage(employeeIndex) {
+            const cardElement = document.getElementById(`employee-card-${employeeIndex}`);
+            if (!cardElement) return;
+
+            html2canvas(cardElement, {
+                useCORS: true,
+                backgroundColor: null,
+            }).then(canvas => {
+                canvas.toBlob(function(blob) {
+                    const file = new File([blob], "schedule.png", {type: "image/png"});
+                    const filesArray = [file];
+                    if (navigator.canShare && navigator.canShare({ files: filesArray })) {
+                        navigator.share({
+                            files: filesArray,
+                            title: 'График сотрудника',
+                            text: 'Посмотрите мой график!'
+                        }).then(() => {
+                            console.log('Share successful');
+                        }).catch((error) => {
+                            console.error('Share failed', error);
+                        });
+                    } else {
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = `schedule_${employeeData[employeeIndex].name}.png`;
+                        link.click();
+                        URL.revokeObjectURL(link.href);
+                    }
+                }, 'image/png');
+        
+                shareModal.classList.remove('open');
+            }).catch(e => {
+                console.error("Failed to capture image for sharing:", e);
+                const message = "Не удалось создать изображение для отправки. Возможно, это ограничение безопасности браузера.";
+                showCustomAlert(message);
+            });
+        }
+
+        function shareAsText(employeeIndex) {
+            const employee = employeeData[employeeIndex];
+            if (!employee) return;
+
+            const workStart = new Date(`2000-01-01T09:45:00`);
+            const workEnd = new Date(`2000-01-01T22:45:00`);
+
+            let totalWorkMinutes = 0;
+            let totalBreakMinutes = 0;
+            const breakDetails = [];
+            const sortedSessions = [...employee.sessions].filter(s => s.start && s.end).sort((a, b) => {
+                return a.start.localeCompare(b.start);
+            });
+            const workDetails = sortedSessions.map(session => {
+                const start = new Date(`2000-01-01T${session.start}:00`);
+                const end = new Date(`2000-01-01T${session.end}:00`);
+                const workMinutes = (end - start) / (1000 * 60);
+                if (workMinutes > 0) totalWorkMinutes += workMinutes;
+                return {
+                    start: session.start,
+                    end: session.end,
+                    replacement: session.replacement
+                };
+            });
+
+            // Calculate free time before first session and after last session
+            if (sortedSessions.length > 0) {
+                const firstSessionStart = new Date(`2000-01-01T${sortedSessions[0].start}:00`);
+                const lastSessionEnd = new Date(`2000-01-01T${sortedSessions[sortedSessions.length - 1].end}:00`);
+
+                if (firstSessionStart > workStart) {
+                    const beforeWorkBreak = (firstSessionStart - workStart) / (1000 * 60);
+                    if (beforeWorkBreak > 0) {
+                         breakDetails.push({
+                            start: "09:45",
+                            end: sortedSessions[0].start,
+                            duration: beforeWorkBreak
+                         });
+                    }
+                }
+
+                if (lastSessionEnd < workEnd) {
+                    const afterWorkBreak = (workEnd - lastSessionEnd) / (1000 * 60);
+                    if (afterWorkBreak > 0) {
+                        breakDetails.push({
+                            start: sortedSessions[sortedSessions.length - 1].end,
+                            end: "22:45",
+                            duration: afterWorkBreak
+                        });
+                    }
+                }
+            } else {
+                 const fullBreak = (workEnd - workStart) / (1000 * 60);
+                 if (fullBreak > 0) {
+                     breakDetails.push({
+                         start: "09:45",
+                         end: "22:45",
+                         duration: fullBreak
+                     });
+                 }
+            }
+            
+            // Calculate breaks between tasks
+            for (let i = 0; i < sortedSessions.length - 1; i++) {
+                const prevEnd = new Date(`2000-01-01T${sortedSessions[i].end}:00`);
+                const nextStart = new Date(`2000-01-01T${sortedSessions[i+1].start}:00`);
+                const breakMinutes = (nextStart - prevEnd) / (1000 * 60);
+                if (breakMinutes > 0) {
+                    breakDetails.push({
+                        start: sortedSessions[i].end,
+                        end: sortedSessions[i+1].start,
+                        duration: breakMinutes
+                    });
+                }
+            }
+
+            totalBreakMinutes = breakDetails.reduce((sum, b) => sum + b.duration, 0);
+            
+            let textToCopy = `⏰ График смен (${employee.name})\n\n`;
+            textToCopy += `✅ Занято: ${totalWorkMinutes} мин\n`;
+            workDetails.forEach(d => {
+                textToCopy += `    ${d.start} - ${d.end} / ${d.replacement}\n`;
+            });
+            textToCopy += `\n🛋️ Свободно: ${totalBreakMinutes} мин\n`;
+            
+            // Sort break details by start time to present them in order
+            breakDetails.sort((a, b) => a.start.localeCompare(b.start));
+            
+            breakDetails.forEach(b => {
+                textToCopy += `    ${b.start} - ${b.end} (${b.duration} мин)\n`;
+            });
+
+            // Use the Web Share API for text sharing if available
+            if (navigator.canShare && navigator.canShare({ text: textToCopy })) {
+                navigator.share({
+                    text: textToCopy
+                }).then(() => {
+                    console.log('Share successful');
+                }).catch((error) => {
+                    console.error('Share failed', error);
+                    fallbackCopyTextToClipboard(textToCopy);
+                });
+            } else {
+                fallbackCopyTextToClipboard(textToCopy);
+            }
+            shareModal.classList.remove('open');
+        }
+
+        function fallbackCopyTextToClipboard(text) {
+            let textArea = document.createElement("textarea");
+            textArea.value = text;
+            // Make the textarea invisible
+            textArea.style.position = "fixed";
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.width = "2em";
+            textArea.style.height = "2em";
+            textArea.style.padding = "0";
+            textArea.style.border = "none";
+            textArea.style.outline = "none";
+            textArea.style.boxShadow = "none";
+            textArea.style.background = "transparent";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                let successful = document.execCommand('copy');
+                if (successful) {
+                    showCustomAlert("Текст скопирован в буфер обмена!");
+                } else {
+                    showCustomAlert("Не удалось скопировать текст. Пожалуйста, скопируйте вручную.");
+                }
+            } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err);
+                showCustomAlert("Не удалось скопировать текст. Пожалуйста, скопируйте вручную.");
+            }
+            document.body.removeChild(textArea);
+        }
+        
+        shareImageBtn.addEventListener('click', () => {
+            if (currentEmployeeIndex !== null) {
+                shareAsImage(currentEmployeeIndex);
+            }
+        });
+
+        shareTextBtn.addEventListener('click', () => {
+            if (currentEmployeeIndex !== null) {
+                shareAsText(currentEmployeeIndex);
+            }
+        });
+
+        modalCloseBtn.addEventListener('click', () => {
+            shareModal.classList.remove('open');
+        });
+
+        addEmployeeBtn.addEventListener('click', () => {
+            const newEmployee = {
+                name: "Новый сотрудник",
+                position: "Должность",
+                image: "https://placehold.co/120x120/E8E8E8/6B6B6B?text=НС",
+                sessions: [{ start: "", end: "", replacement: "" }]
+            };
+            employeeData.push(newEmployee);
+            saveDataAndRender();
+        });
+
+        clearAllBtn.addEventListener('click', () => {
+            // Using a simple popup to mimic a confirmation
+            const confirmationPopup = document.createElement('div');
+            confirmationPopup.style.cssText = `
+                position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                z-index: 1000; text-align: center;
+            `;
+            confirmationPopup.innerHTML = `
+                <p>Вы уверены, что хотите очистить все данные?</p>
+                <div style="margin-top: 15px;">
+                    <button id="confirm-yes" style="padding: 8px 16px; margin: 0 5px; border-radius: 5px; border: 1px solid #ccc; cursor: pointer;">Да</button>
+                    <button id="confirm-no" style="padding: 8px 16px; margin: 0 5px; border-radius: 5px; border: 1px solid #ccc; cursor: pointer;">Нет</button>
+                </div>
+            `;
+            document.body.appendChild(confirmationPopup);
+
+            document.getElementById('confirm-yes').onclick = () => {
+                localStorage.removeItem('employeeSchedules');
+                employeeData = [];
+                renderEmployees();
+                confirmationPopup.remove();
+            };
+            document.getElementById('confirm-no').onclick = () => {
+                confirmationPopup.remove();
+            };
+        });
+        
+        renderEmployees();
+    });
+</script>
+
+</body>
+</html>
