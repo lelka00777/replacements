@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Операция Ланч 🍕🚀</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+            padding: 0.5rem;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        #employees-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .employee-card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            padding: 0.75rem;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+        .profile-img-container {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #3b82f6;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+            transition: border-color 0.3s;
+        }
+        .profile-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .profile-emoji {
+            font-size: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+        }
+        .profile-name {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+        .profile-position {
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+        .section-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-top: 0.75rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+        .session-block-group {
+            background-color: #f9fafb;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+        }
+        .session-block {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            cursor: pointer;
+            position: relative;
+        }
+        .session-block .input-group {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .session-block input {
+            flex: 1;
+            padding: 0.4rem;
+            border-radius: 0.5rem;
+            border: 1px solid #d1d5db;
+            font-size: 0.8rem;
+            background-color: #ffffff;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .session-block .remove-btn {
+            background-color: transparent;
+            color: #ef4444;
+            padding: 0.25rem 0.5rem;
+            line-height: 1;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            width: 2rem;
+            height: 2rem;
+        }
+        .session-block .remove-btn:hover {
+            background-color: #fecaca;
+        }
+        .btn-add, .btn-calculate {
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            font-size: 0.8rem;
+        }
+        .btn-add {
+            background-color: #e5e7eb;
+            color: #4b5563;
+        }
+        .btn-add:hover {
+            background-color: #d1d5db;
+        }
+        .btn-calculate, #load-data-btn, #share-image-btn, #share-text-btn, #parse-data-btn, #theme-toggle-btn {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .btn-calculate:hover, #load-data-btn:hover, #share-image-btn:hover, #share-text-btn:hover, #parse-data-btn:hover, #theme-toggle-btn:hover {
+            background-color: #2563eb;
+        }
+        .results-section {
+            margin-top: 0.75rem;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 0.75rem;
+            transition: border-color 0.3s;
+        }
+        .results-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .results-section li {
+            background-color: #f9fafb;
+            padding: 0.4rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.25rem;
+            font-size: 0.8rem;
+            transition: background-color 0.3s;
+        }
+        .results-title-container {
+             display: flex;
+             justify-content: space-between;
+             align-items: center;
+             margin-bottom: 0.5rem;
+        }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal.open {
+            visibility: visible;
+            opacity: 1;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+            transition: background-color 0.3s;
+        }
+        #load-data-modal .modal-content {
+            text-align: left;
+        }
+        #load-data-modal textarea {
+            width: 100%;
+            height: 200px;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            font-family: monospace;
+            font-size: 0.8rem;
+            background-color: #f9fafb;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+        .modal-close-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            line-height: 1;
+            transition: color 0.3s;
+        }
+        .alert-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1001;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+        .session-block.conflict .input-group:first-child input {
+            border-color: #ef4444;
+            border-width: 2px;
+        }
+        .conflict-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #ef4444;
+            color: white;
+            padding: 4px;
+            border-radius: 0.5rem;
+            font-size: 0.7rem;
+            white-space: nowrap;
+            cursor: pointer;
+            margin-left: 0.5rem;
+            min-width: 2rem; /* Ensure minimum width for icon */
+        }
+        .conflict-label-text {
+            display: none;
+        }
+        @media (min-width: 640px) {
+            .conflict-label {
+                padding: 4px 8px;
+            }
+            .conflict-label-text {
+                display: inline;
+                margin-left: 0.25rem;
+            }
+        }
+        .conflict-options-modal .modal-content {
+            max-width: 500px;
+            text-align: left;
+        }
+        .conflict-options-modal ul {
+            list-style: none;
+            padding: 0;
+        }
+        .conflict-options-modal li {
+            background-color: #f3f4f6;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .conflict-options-modal li:hover {
+            background-color: #e5e7eb;
+        }
+        .avatar-modal-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .avatar-modal-option {
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .avatar-modal-option:hover {
+            background-color: #f3f4f6;
+        }
+        .avatar-modal-option input[type="file"], .avatar-modal-option input[type="text"] {
+            display: none;
+        }
+        .avatar-modal-option.active {
+            border-color: #3b82f6;
+            background-color: #e0f2fe;
+        }
+        /* Dark Theme Styles */
+        body.dark-theme {
+            background-color: #1f2937;
+            color: #e5e7eb;
+        }
+        body.dark-theme .employee-card {
+            background-color: #374151;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        body.dark-theme .profile-position, body.dark-theme .session-block input::placeholder, body.dark-theme #data-input::placeholder {
+            color: #9ca3af;
+        }
+        body.dark-theme .session-block-group {
+            background-color: #2d3748;
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+        }
+        body.dark-theme .session-block input {
+            background-color: #374151;
+            border-color: #4b5563;
+            color: #e5e7eb;
+        }
+        body.dark-theme .btn-add {
+            background-color: #4b5563;
+            color: #e5e7eb;
+        }
+        body.dark-theme .btn-add:hover {
+            background-color: #6b7280;
+        }
+        body.dark-theme .results-section {
+            border-top-color: #4b5563;
+        }
+        body.dark-theme .results-section li {
+            background-color: #4b5563;
+            color: #e5e7eb;
+        }
+        body.dark-theme .modal-content, body.dark-theme .alert-popup {
+            background-color: #374151;
+            color: #e5e7eb;
+        }
+        body.dark-theme #load-data-modal textarea {
+            background-color: #4b5563;
+            color: #e5e7eb;
+            border-color: #6b7280;
+        }
+        body.dark-theme .modal-close-btn {
+            color: #e5e7eb;
+        }
+        body.dark-theme .conflict-options-modal li, body.dark-theme .avatar-modal-option {
+            background-color: #4b5563;
+            color: #e5e7eb;
+            border-color: #6b7280;
+        }
+        body.dark-theme .conflict-options-modal li:hover, body.dark-theme .avatar-modal-option:hover {
+            background-color: #6b7280;
+        }
+        body.dark-theme .avatar-modal-option.active {
+            background-color: #0c4a6e;
+            border-color: #3b82f6;
+        }
+        body.dark-theme .session-block .remove-btn {
+            color: #e5e7eb;
+        }
+        body.dark-theme .session-block .remove-btn:hover {
+            background-color: #4b5563;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="flex justify-between items-center mb-4">
+        <h1 class="text-xl font-bold text-center">Операция Ланч 🍕🚀</h1>
+        <button id="theme-toggle-btn" class="btn-calculate" title="Переключить тему">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+            </svg>
+        </button>
+    </div>
+    <div id="employees-container">
+        
+
+</div>
+    <div class="flex justify-center mt-4 gap-2">
+        <button id="add-employee-btn" class="btn-add">Добавить сотрудника</button>
+        <button id="clear-all-btn" class="btn-add">Очистить всё</button>
+        <button id="load-data-btn" class="btn-calculate">Загрузить данные</button>
+    </div>
+</div>
+
+<div id="share-modal" class="modal">
+    <div class="modal-content">
+        <span class="modal-close-btn">&times;</span>
+        <h3 class="text-lg font-bold mb-4">Выберите способ отправки</h3>
+        <div class="flex flex-col gap-4">
+            <button id="share-image-btn" class="btn-calculate">Поделиться как изображение</button>
+            <button id="share-text-btn" class="btn-add">Поделиться как текст</button>
+        </div>
+    </div>
+</div>
+
+<div id="load-data-modal" class="modal">
+    <div class="modal-content">
+        <span class="modal-close-btn">&times;</span>
+        <h3 class="text-lg font-bold mb-4">Вставьте данные для загрузки</h3>
+        <textarea id="data-input" placeholder="Пример:&#10;👤 Ульяна (Скан 1): 11:50-12:20, 15:00-16:00"></textarea>
+        <div class="flex justify-end mt-4">
+            <button id="parse-data-btn" class="btn-calculate">Обработать</button>
+        </div>
+    </div>
+</div>
+
+<div id="session-options-modal" class="modal conflict-options-modal">
+    <div class="modal-content">
+        <span class="modal-close-btn">&times;</span>
+        <h3 class="text-lg font-bold mb-4" id="session-options-title">Действия с сессией</h3>
+        <p class="text-sm text-gray-600 mb-4" id="session-options-text"></p>
+        <div id="session-options-list">
+            
+
+</div>
+    </div>
+</div>
+
+<div id="avatar-modal" class="modal">
+    <div class="modal-content">
+        <span class="modal-close-btn">&times;</span>
+        <h3 class="text-lg font-bold mb-4">Выберите аватар</h3>
+        <div class="avatar-modal-options">
+            <label for="file-upload" class="avatar-modal-option">
+                Загрузить изображение
+                <input type="file" id="file-upload" accept="image/*">
+            </label>
+            <div class="avatar-modal-option" id="emoji-option">
+                Ввести эмодзи
+                <input type="text" id="emoji-input" placeholder="Введите эмодзи">
+            </div>
+            <div class="avatar-modal-option" id="initials-option">
+                Буквы имени
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const employeesContainer = document.getElementById('employees-container');
+        const addEmployeeBtn = document.getElementById('add-employee-btn');
+        const clearAllBtn = document.getElementById('clear-all-btn');
+        const loadDataBtn = document.getElementById('load-data-btn');
+        const shareModal = document.getElementById('share-modal');
+        const shareImageBtn = document.getElementById('share-image-btn');
+        const shareTextBtn = document.getElementById('share-text-btn');
+        const loadDataModal = document.getElementById('load-data-modal');
+        const dataInput = document.getElementById('data-input');
+        const parseDataBtn = document.getElementById('parse-data-btn');
+        const sessionOptionsModal = document.getElementById('session-options-modal');
+        const sessionOptionsList = document.getElementById('session-options-list');
+        const sessionOptionsTitle = document.getElementById('session-options-title');
+        const sessionOptionsText = document.getElementById('session-options-text');
+        const avatarModal = document.getElementById('avatar-modal');
+        const fileUpload = document.getElementById('file-upload');
+        const emojiInput = document.getElementById('emoji-input');
+        const emojiOption = document.getElementById('emoji-option');
+        const initialsOption = document.getElementById('initials-option');
+        const themeToggleBtn = document.getElementById('theme-toggle-btn');
+        const body = document.body;
+
+        let currentEmployeeIndex = null;
+        let employeeData = [];
+
+        const savedData = localStorage.getItem('employeeSchedules');
+        if (savedData) {
+            employeeData = JSON.parse(savedData);
+        } else {
+            employeeData = [
+                {
+                    name: "Влад",
+                    position: "Дверь",
+                    image: "ВЛ",
+                    sessions: []
+                },
+                {
+                    name: "Ксюша",
+                    position: "Welcome",
+                    image: "КС",
+                    sessions: []
+                }
+            ];
+        }
+
+        function getInitials(name) {
+            if (!name) return '';
+            const parts = name.trim().split(/\s+/);
+            if (parts.length > 1) {
+                return parts[0].charAt(0).toUpperCase() + parts[1].charAt(0).toUpperCase();
+            }
+            return parts[0].substring(0, 2).toUpperCase();
+        }
+        
+        function hasConflict(employeeSessions, sessionStart, sessionEnd, ignoreIndex) {
+            const proposedStart = new Date(`2000-01-01T${sessionStart}`);
+            const proposedEnd = new Date(`2000-01-01T${sessionEnd}`);
+
+            if (proposedEnd <= proposedStart) {
+                return true;
+            }
+
+            for (let i = 0; i < employeeSessions.length; i++) {
+                if (i === ignoreIndex) continue;
+                const existingStart = new Date(`2000-01-01T${employeeSessions[i].start}`);
+                const existingEnd = new Date(`2000-01-01T${employeeSessions[i].end}`);
+                
+                if (proposedStart < existingEnd && proposedEnd > existingStart) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function checkAndMarkAllConflicts() {
+            employeeData.forEach(employee => {
+                employee.sessions.forEach((session, sessionIndex) => {
+                    if (session.resolved) {
+                        session.conflict = false;
+                        return;
+                    }
+                    const has_conflict = hasConflict(employee.sessions, session.start, session.end, sessionIndex);
+                    session.conflict = has_conflict;
+                });
+            });
+        }
+        
+        function renderEmployees() {
+            employeesContainer.innerHTML = '';
+            checkAndMarkAllConflicts();
+            employeeData.forEach((employee, employeeIndex) => {
+                const card = document.createElement('div');
+                card.classList.add('employee-card');
+                card.id = `employee-card-${employeeIndex}`;
+
+                let avatarContent;
+                if (employee.image.startsWith('data:image') || employee.image.startsWith('https://placehold.co')) {
+                    avatarContent = `<img src="${employee.image}" alt="Профиль ${employee.name}" class="profile-img">`;
+                } else {
+                    avatarContent = `<span class="profile-emoji">${employee.image}</span>`;
+                }
+
+                const profileHeader = `
+                    <div class="profile-header">
+                        <div class="profile-img-container" data-employee-index="${employeeIndex}">
+                            ${avatarContent}
+                        </div>
+                        <div>
+                            <input type="text" value="${employee.name}" class="profile-name bg-transparent border-none focus:outline-none w-full" data-employee-index="${employeeIndex}" data-field="name">
+                            <input type="text" value="${employee.position}" class="profile-position bg-transparent border-none focus:outline-none w-full" data-employee-index="${employeeIndex}" data-field="position">
+                        </div>
+                    </div>
+                `;
+                card.innerHTML = profileHeader;
+
+                const scheduleSection = document.createElement('div');
+                scheduleSection.classList.add('schedule-section');
+
+                const sessionsTitle = document.createElement('h4');
+                sessionsTitle.classList.add('section-title');
+                sessionsTitle.textContent = "Слоты";
+                scheduleSection.appendChild(sessionsTitle);
+
+                const sessionsContainer = document.createElement('div');
+                sessionsContainer.id = `sessions-container-${employeeIndex}`;
+
+                employee.sessions.forEach((session, sessionIndex) => {
+                    const sessionBlock = createSessionBlock(employeeIndex, sessionIndex, session.start, session.end, session.replacement, session.conflict);
+                    sessionsContainer.appendChild(sessionBlock);
+                });
+                scheduleSection.appendChild(sessionsContainer);
+
+                const buttonsDiv = document.createElement('div');
+                buttonsDiv.classList.add('flex', 'gap-2', 'mt-2', 'mb-2');
+                const addSessionBtn = document.createElement('button');
+                addSessionBtn.classList.add('btn-add');
+                addSessionBtn.textContent = 'Добавить';
+                addSessionBtn.addEventListener('click', () => {
+                    employeeData[employeeIndex].sessions.push({ start: "", end: "", replacement: "", conflict: false });
+                    saveDataAndRender();
+                });
+                buttonsDiv.appendChild(addSessionBtn);
+
+                const calculateBtn = document.createElement('button');
+                calculateBtn.classList.add('btn-calculate');
+                calculateBtn.textContent = 'Рассчитать';
+                calculateBtn.addEventListener('click', () => {
+                    saveData();
+                    calculateAndDisplay(employeeData[employeeIndex], employeeIndex);
+                });
+                buttonsDiv.appendChild(calculateBtn);
+
+                const shareBtn = document.createElement('button');
+                shareBtn.classList.add('btn-calculate');
+                shareBtn.textContent = 'Поделиться';
+                shareBtn.addEventListener('click', () => {
+                    currentEmployeeIndex = employeeIndex;
+                    shareModal.classList.add('open');
+                });
+                buttonsDiv.appendChild(shareBtn);
+
+                scheduleSection.appendChild(buttonsDiv);
+
+                const resultsSection = document.createElement('div');
+                resultsSection.id = `results-section-${employeeIndex}`;
+                resultsSection.classList.add('results-section');
+                scheduleSection.appendChild(resultsSection);
+
+                card.appendChild(scheduleSection);
+                employeesContainer.appendChild(card);
+                
+                calculateAndDisplay(employee, employeeIndex);
+            });
+
+            document.querySelectorAll('input[data-field]').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const empIdx = e.target.dataset.employeeIndex;
+                    const field = e.target.dataset.field;
+                    employeeData[empIdx][field] = e.target.value;
+                    if (field === 'name') {
+                        if (!employeeData[empIdx].image.startsWith('data:image') && !employeeData[empIdx].image.includes('placehold.co') && e.target.value.trim() !== '') {
+                             employeeData[empIdx].image = getInitials(e.target.value);
+                        }
+                    }
+                    saveDataAndRender();
+                });
+            });
+
+            document.querySelectorAll('.profile-img-container').forEach(container => {
+                container.addEventListener('click', (e) => {
+                    const empIdx = e.currentTarget.dataset.employeeIndex;
+                    currentEmployeeIndex = parseInt(empIdx);
+                    avatarModal.classList.add('open');
+                });
+            });
+        }
+
+        function createSessionBlock(employeeIndex, sessionIndex, startValue, endValue, replacementValue, isConflicted) {
+            const sessionBlockGroup = document.createElement('div');
+            sessionBlockGroup.classList.add('session-block-group');
+
+            const sessionBlock = document.createElement('div');
+            sessionBlock.classList.add('session-block');
+            
+            const conflictLabel = isConflicted ? `
+                <span class="conflict-label">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M8.257 3.328a1 1 0 011.486 0l5.5 8.25a1 1 0 01-.194 1.34L13.78 14H6.22a1 1 0 01-.72-1.611l.245-.244a1 1 0 011.414 0l.455.455a.5.5 0 00.707 0l.455-.455a1 1 0 011.414 0l.455.455a.5.5 0 00.707 0l.455-.455a1 1 0 011.414 0L17.5 12.293a1 1 0 01.194-1.34l-5.5-8.25z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="conflict-label-text">Конфликт!</span>
+                </span>
+            ` : '';
+            if (isConflicted) {
+                sessionBlock.classList.add('conflict');
+            }
+
+            sessionBlock.innerHTML = `
+                <div class="input-group">
+                    <input type="time" class="session-start" value="${startValue || ""}" data-employee-index="${employeeIndex}" data-session-index="${sessionIndex}">
+                    <input type="time" class="session-end" value="${endValue || ""}" data-employee-index="${employeeIndex}" data-session-index="${sessionIndex}">
+                </div>
+                <div class="input-group">
+                    <input type="text" class="session-replacement" value="${replacementValue || ""}" placeholder="Заменяет..." data-employee-index="${employeeIndex}" data-session-index="${sessionIndex}">
+                    <button class="remove-btn" data-employee-index="${employeeIndex}" data-session-index="${sessionIndex}">🗑️</button>
+                    ${conflictLabel}
+                </div>
+            `;
+            const removeBtn = sessionBlock.querySelector('.remove-btn');
+            removeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                employeeData[employeeIndex].sessions.splice(sessionIndex, 1);
+                saveDataAndRender();
+            });
+
+            sessionBlock.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showSessionOptions(employeeIndex, sessionIndex);
+            });
+
+            const inputs = sessionBlock.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const empIdx = e.target.dataset.employeeIndex;
+                    const sessIdx = e.target.dataset.sessionIndex;
+                    if (e.target.classList.contains('session-start')) {
+                        employeeData[empIdx].sessions[sessIdx].start = e.target.value;
+                    } else if (e.target.classList.contains('session-end')) {
+                        employeeData[empIdx].sessions[sessIdx].end = e.target.value;
+                    } else if (e.target.classList.contains('session-replacement')) {
+                        employeeData[empIdx].sessions[sessIdx].replacement = e.target.value;
+                    }
+                    employeeData[empIdx].sessions[sessIdx].resolved = false;
+                    saveDataAndRender();
+                });
+            });
+
+            sessionBlockGroup.appendChild(sessionBlock);
+            return sessionBlockGroup;
+        }
+
+        function calculateAndDisplay(employee, employeeIndex) {
+            const resultsSection = document.getElementById(`results-section-${employeeIndex}`);
+            const workStart = new Date(`2000-01-01T09:45:00`);
+            const workEnd = new Date(`2000-01-01T22:45:00`);
+
+            let totalWorkMinutes = 0;
+            let totalBreakMinutes = 0;
+            const breakDetails = [];
+            const workDetails = [];
+            
+            const sortedSessions = [...employee.sessions].filter(s => s.start && s.end).sort((a, b) => {
+                return a.start.localeCompare(b.start);
+            });
+
+            sortedSessions.forEach((session, index) => {
+                const start = new Date(`2000-01-01T${session.start}:00`);
+                const end = new Date(`2000-01-01T${session.end}:00`);
+                
+                const workMinutes = (end - start) / (1000 * 60);
+                if (workMinutes > 0) {
+                    totalWorkMinutes += workMinutes;
+                    workDetails.push({ start: session.start, end: session.end, duration: workMinutes, replacement: session.replacement });
+                }
+
+                if (index > 0) {
+                    const prevEnd = new Date(`2000-01-01T${sortedSessions[index - 1].end}:00`);
+                    const breakMinutes = (start - prevEnd) / (1000 * 60);
+                    if (breakMinutes > 0) {
+                        breakDetails.push({
+                            start: sortedSessions[index - 1].end,
+                            end: session.start,
+                            duration: breakMinutes
+                        });
+                    }
+                }
+            });
+
+            if (sortedSessions.length > 0) {
+                const firstSessionStart = new Date(`2000-01-01T${sortedSessions[0].start}:00`);
+                const lastSessionEnd = new Date(`2000-01-01T${sortedSessions[sortedSessions.length - 1].end}:00`);
+
+                if (firstSessionStart > workStart) {
+                    const beforeWorkBreak = (firstSessionStart - workStart) / (1000 * 60);
+                    if (beforeWorkBreak > 0) {
+                         breakDetails.push({
+                            start: "09:45",
+                            end: sortedSessions[0].start,
+                            duration: beforeWorkBreak
+                         });
+                    }
+                }
+
+                if (lastSessionEnd < workEnd) {
+                    const afterWorkBreak = (workEnd - lastSessionEnd) / (1000 * 60);
+                    if (afterWorkBreak > 0) {
+                        breakDetails.push({
+                            start: sortedSessions[sortedSessions.length - 1].end,
+                            end: "22:45",
+                            duration: afterWorkBreak
+                        });
+                    }
+                }
+            } else {
+                 const fullBreak = (workEnd - workStart) / (1000 * 60);
+                 if (fullBreak > 0) {
+                     breakDetails.push({
+                         start: "09:45",
+                         end: "22:45",
+                         duration: fullBreak
+                     });
+                 }
+            }
+
+            totalBreakMinutes = breakDetails.reduce((sum, b) => sum + b.duration, 0);
+
+            resultsSection.innerHTML = `
+                <div class="space-y-4">
+                    <div class="p-3 bg-gray-50 rounded-lg shadow-sm">
+                        <div class="flex items-center justify-between font-bold text-sm mb-2">
+                            <span>Занято: ${totalWorkMinutes} мин</span>
+                        </div>
+                        <ul class="space-y-1 text-xs">
+                            ${workDetails.map(d => `<li class="bg-white p-2 rounded-md shadow-sm">${d.start} - ${d.end} / ${d.replacement}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div class="p-3 bg-gray-50 rounded-lg shadow-sm">
+                        <div class="flex items-center justify-between font-bold text-sm mb-2">
+                            <span>Свободно: ${totalBreakMinutes} мин</span>
+                        </div>
+                        <ul class="space-y-1 text-xs">
+                            ${breakDetails.sort((a, b) => a.start.localeCompare(b.start)).map(b => `<li class="bg-white p-2 rounded-md shadow-sm">${b.start} - ${b.end} (${b.duration} мин)</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem('employeeSchedules', JSON.stringify(employeeData));
+            } catch (e) {
+                console.error('Failed to save data:', e);
+            }
+        }
+
+        function saveDataAndRender() {
+            saveData();
+            renderEmployees();
+        }
+        
+        function showCustomAlert(message) {
+            const alertPopup = document.createElement('div');
+            alertPopup.className = 'alert-popup';
+            alertPopup.innerHTML = `
+                <p>${message}</p>
+                <button onclick="this.parentNode.remove()" style="padding: 8px 16px; margin-top: 15px; border-radius: 5px; border: 1px solid #ccc; cursor: pointer;">ОК</button>
+            `;
+            document.body.appendChild(alertPopup);
+        }
+
+        function shareAsImage(employeeIndex) {
+            const cardElement = document.getElementById(`employee-card-${employeeIndex}`);
+            if (!cardElement) return;
+
+            html2canvas(cardElement, {
+                useCORS: true,
+                backgroundColor: null,
+            }).then(canvas => {
+                canvas.toBlob(function(blob) {
+                    const file = new File([blob], "schedule.png", {type: "image/png"});
+                    const filesArray = [file];
+                    if (navigator.canShare && navigator.canShare({ files: filesArray })) {
+                        navigator.share({
+                            files: filesArray,
+                            title: 'График сотрудника',
+                            text: 'Посмотрите мой график!'
+                        }).then(() => {
+                            console.log('Share successful');
+                        }).catch((error) => {
+                            console.error('Share failed', error);
+                        });
+                    } else {
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = `schedule_${employeeData[employeeIndex].name}.png`;
+                        link.click();
+                        URL.revokeObjectURL(link.href);
+                    }
+                }, 'image/png');
+        
+                shareModal.classList.remove('open');
+            }).catch(e => {
+                console.error("Failed to capture image for sharing:", e);
+                const message = "Не удалось создать изображение для отправки. Возможно, это ограничение безопасности браузера.";
+                showCustomAlert(message);
+            });
+        }
+
+        function shareAsText(employeeIndex) {
+            const employee = employeeData[employeeIndex];
+            if (!employee) return;
+
+            const workStart = new Date(`2000-01-01T09:45:00`);
+            const workEnd = new Date(`2000-01-01T22:45:00`);
+
+            let totalWorkMinutes = 0;
+            let totalBreakMinutes = 0;
+            const breakDetails = [];
+            const sortedSessions = [...employee.sessions].filter(s => s.start && s.end).sort((a, b) => {
+                return a.start.localeCompare(b.start);
+            });
+            const workDetails = sortedSessions.map(session => {
+                const start = new Date(`2000-01-01T${session.start}:00`);
+                const end = new Date(`2000-01-01T${session.end}:00`);
+                const workMinutes = (end - start) / (1000 * 60);
+                if (workMinutes > 0) totalWorkMinutes += workMinutes;
+                return {
+                    start: session.start,
+                    end: session.end,
+                    replacement: session.replacement
+                };
+            });
+
+            if (sortedSessions.length > 0) {
+                const firstSessionStart = new Date(`2000-01-01T${sortedSessions[0].start}:00`);
+                const lastSessionEnd = new Date(`2000-01-01T${sortedSessions[sortedSessions.length - 1].end}:00`);
+
+                if (firstSessionStart > workStart) {
+                    const beforeWorkBreak = (firstSessionStart - workStart) / (1000 * 60);
+                    if (beforeWorkBreak > 0) {
+                         breakDetails.push({
+                            start: "09:45",
+                            end: sortedSessions[0].start,
+                            duration: beforeWorkBreak
+                         });
+                    }
+                }
+
+                if (lastSessionEnd < workEnd) {
+                    const afterWorkBreak = (workEnd - lastSessionEnd) / (1000 * 60);
+                    if (afterWorkBreak > 0) {
+                        breakDetails.push({
+                            start: sortedSessions[sortedSessions.length - 1].end,
+                            end: "22:45",
+                            duration: afterWorkBreak
+                        });
+                    }
+                }
+            } else {
+                 const fullBreak = (workEnd - workStart) / (1000 * 60);
+                 if (fullBreak > 0) {
+                     breakDetails.push({
+                         start: "09:45",
+                         end: "22:45",
+                         duration: fullBreak
+                     });
+                 }
+            }
+            
+            for (let i = 0; i < sortedSessions.length - 1; i++) {
+                const prevEnd = new Date(`2000-01-01T${sortedSessions[i].end}:00`);
+                const nextStart = new Date(`2000-01-01T${sortedSessions[i+1].start}:00`);
+                const breakMinutes = (nextStart - prevEnd) / (1000 * 60);
+                if (breakMinutes > 0) {
+                    breakDetails.push({
+                        start: sortedSessions[i].end,
+                        end: sortedSessions[i+1].start,
+                        duration: breakMinutes
+                    });
+                }
+            }
+
+            totalBreakMinutes = breakDetails.reduce((sum, b) => sum + b.duration, 0);
+            
+            let textToCopy = `⏰ График смен (${employee.name})\n\n`;
+            textToCopy += `✅ Занято: ${totalWorkMinutes} мин\n`;
+            workDetails.forEach(d => {
+                textToCopy += `    ${d.start} - ${d.end} / ${d.replacement}\n`;
+            });
+            textToCopy += `\n🛋️ Свободно: ${totalBreakMinutes} мин\n`;
+            
+            breakDetails.sort((a, b) => a.start.localeCompare(b.start));
+            
+            breakDetails.forEach(b => {
+                textToCopy += `    ${b.start} - ${b.end} (${b.duration} мин)\n`;
+            });
+
+            if (navigator.canShare && navigator.canShare({ text: textToCopy })) {
+                navigator.share({
+                    text: textToCopy
+                }).then(() => {
+                    console.log('Share successful');
+                }).catch((error) => {
+                    console.error('Share failed', error);
+                    fallbackCopyTextToClipboard(textToCopy);
+                });
+            } else {
+                fallbackCopyTextToClipboard(textToCopy);
+            }
+            shareModal.classList.remove('open');
+        }
+
+        function fallbackCopyTextToClipboard(text) {
+            let textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.width = "2em";
+            textArea.style.height = "2em";
+            textArea.style.padding = "0";
+            textArea.style.border = "none";
+            textArea.style.outline = "none";
+            textArea.style.boxShadow = "none";
+            textArea.style.background = "transparent";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                let successful = document.execCommand('copy');
+                if (successful) {
+                    showCustomAlert("Текст скопирован в буфер обмена!");
+                } else {
+                    showCustomAlert("Не удалось скопировать текст. Пожалуйста, скопируйте вручную.");
+                }
+            } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err);
+                showCustomAlert("Не удалось скопировать текст. Пожалуйста, скопируйте вручную.");
+            }
+            document.body.removeChild(textArea);
+        }
+        
+        loadDataBtn.addEventListener('click', () => {
+            loadDataModal.classList.add('open');
+            dataInput.value = "";
+        });
+
+        parseDataBtn.addEventListener('click', () => {
+            const rawData = dataInput.value;
+            if (!rawData) {
+                showCustomAlert("Пожалуйста, вставьте данные.");
+                return;
+            }
+            
+            employeeData.forEach(employee => {
+                employee.sessions = [];
+            });
+            
+            let allSessions = [];
+            const lines = rawData.split('\n');
+            lines.forEach(line => {
+                if (line.includes('нет перерывов') || !line.includes(':') || !line.includes('👤')) return;
+
+                const parts = line.split(':');
+                const header = parts[0].trim().replace('👤', '').trim();
+                const sessionsText = parts.slice(1).join(':').trim();
+
+                let replacementText = header;
+                const nameMatch = header.match(/(.+?)\s*\((.+)\)/);
+                if (nameMatch) {
+                    replacementText = `${nameMatch[1].trim()} (${nameMatch[2].trim()})`;
+                }
+
+                sessionsText.split(',').forEach(s => {
+                    const timeRange = s.trim();
+                    const [start, end] = timeRange.split('-');
+                    if (start && end) {
+                        allSessions.push({
+                            start: start.trim(),
+                            end: end.trim(),
+                            replacement: replacementText,
+                            conflict: false
+                        });
+                    }
+                });
+            });
+
+            if (allSessions.length === 0) {
+                showCustomAlert("Не удалось разобрать данные. Проверьте, что формат верный.");
+                return;
+            }
+            
+            const employeesWithWorkload = employeeData.map((employee, index) => ({
+                ...employee,
+                index: index,
+                minutes: 0
+            }));
+
+            if (employeesWithWorkload.length === 0) {
+                 showCustomAlert("Нет сотрудников для назначения сессий. Пожалуйста, добавьте их в приложение.");
+                 return;
+            }
+
+            allSessions.sort((a, b) => a.start.localeCompare(b.start));
+            
+            allSessions.forEach(session => {
+                const start = new Date(`2000-01-01T${session.start}`);
+                const end = new Date(`2000-01-01T${session.end}`);
+                const duration = (end - start) / (1000 * 60);
+
+                const sortedEmployees = [...employeesWithWorkload].sort((a, b) => a.minutes - b.minutes);
+                const targetEmployee = sortedEmployees[0];
+
+                employeeData[targetEmployee.index].sessions.push(session);
+                
+                const originalEmployeeObject = employeesWithWorkload.find(e => e.index === targetEmployee.index);
+                if (originalEmployeeObject) {
+                    originalEmployeeObject.minutes += duration;
+                }
+            });
+            
+            saveDataAndRender();
+            loadDataModal.classList.remove('open');
+            showCustomAlert("Данные успешно загружены и распределены! Проверьте, есть ли конфликты, подсвеченные красным.");
+        });
+
+        function showSessionOptions(employeeIndex, sessionIndex) {
+            const currentSession = employeeData[employeeIndex].sessions[sessionIndex];
+            const currentEmployee = employeeData[employeeIndex];
+            const originalReplacement = currentSession.replacement;
+            const originalDuration = (new Date(`2000-01-01T${currentSession.end}`) - new Date(`2000-01-01T${currentSession.start}`)) / (1000 * 60);
+            
+            sessionOptionsList.innerHTML = '';
+            
+            const isConflicted = currentSession.conflict;
+
+            sessionOptionsTitle.textContent = isConflicted ? "Решение конфликта" : "Действия со слотом";
+            sessionOptionsText.textContent = isConflicted ? "Выберите один из вариантов для решения конфликта по времени." : "Выберите, как вы хотите изменить слот.";
+
+            const addSolution = (description, action) => {
+                const li = document.createElement('li');
+                li.textContent = description;
+                li.addEventListener('click', () => {
+                    action();
+                    sessionOptionsModal.classList.remove('open');
+                });
+                sessionOptionsList.appendChild(li);
+            };
+
+            // Option 1: Keep as is (only if there is a conflict)
+            if (isConflicted) {
+                addSolution(`Оставить как есть`, () => {
+                    employeeData[employeeIndex].sessions[sessionIndex].resolved = true;
+                    employeeData[employeeIndex].sessions[sessionIndex].conflict = false;
+                    saveDataAndRender();
+                    showCustomAlert(`Конфликт для слота ${originalReplacement} был оставлен как есть.`);
+                });
+            }
+
+            // Option 2: Find next available slot for current employee (iterative search)
+            const findNextAvailableTime = (start, direction) => {
+                let currentStart = new Date(`2000-01-01T${start}`);
+                let iterations = 0;
+                while (iterations < 50) {
+                    currentStart.setMinutes(currentStart.getMinutes() + direction * 15);
+                    const newStartStr = `${String(currentStart.getHours()).padStart(2, '0')}:${String(currentStart.getMinutes()).padStart(2, '0')}`;
+                    const newEnd = new Date(currentStart);
+                    newEnd.setMinutes(newEnd.getMinutes() + originalDuration);
+                    const newEndStr = `${String(newEnd.getHours()).padStart(2, '0')}:${String(newEnd.getMinutes()).padStart(2, '0')}`;
+                    
+                    if (newStartStr > '09:45' && newEndStr < '22:45' && !hasConflict(currentEmployee.sessions, newStartStr, newEndStr, sessionIndex)) {
+                        return { start: newStartStr, end: newEndStr };
+                    }
+                    iterations++;
+                }
+                return null;
+            };
+
+            const forwardSolution = findNextAvailableTime(currentSession.start, 1);
+            if (forwardSolution) {
+                addSolution(`Сдвинуть на ${forwardSolution.start}-${forwardSolution.end} (вперед)`, () => {
+                    employeeData[employeeIndex].sessions[sessionIndex].start = forwardSolution.start;
+                    employeeData[employeeIndex].sessions[sessionIndex].end = forwardSolution.end;
+                    employeeData[employeeIndex].sessions[sessionIndex].resolved = true;
+                    employeeData[employeeIndex].sessions[sessionIndex].conflict = false;
+                    saveDataAndRender();
+                    showCustomAlert(`Слот ${originalReplacement} перенесен на ${forwardSolution.start}-${forwardSolution.end}`);
+                });
+            }
+
+            const backwardSolution = findNextAvailableTime(currentSession.start, -1);
+            if (backwardSolution) {
+                addSolution(`Сдвинуть на ${backwardSolution.start}-${backwardSolution.end} (назад)`, () => {
+                    employeeData[employeeIndex].sessions[sessionIndex].start = backwardSolution.start;
+                    employeeData[employeeIndex].sessions[sessionIndex].end = backwardSolution.end;
+                    employeeData[employeeIndex].sessions[sessionIndex].resolved = true;
+                    employeeData[employeeIndex].sessions[sessionIndex].conflict = false;
+                    saveDataAndRender();
+                    showCustomAlert(`Слот ${originalReplacement} перенесен на ${backwardSolution.start}-${backwardSolution.end}`);
+                });
+            }
+
+            // Option 3: Find first available slot for a colleague, closest to original time
+            const otherEmployees = employeeData.filter((emp, idx) => idx !== employeeIndex);
+            
+            otherEmployees.forEach((otherEmp, otherEmpIndex) => {
+                const colleagueIndex = employeeData.indexOf(otherEmp);
+                const workStart = new Date(`2000-01-01T09:45:00`);
+                const workEnd = new Date(`2000-01-01T22:45:00`);
+                const sessionTime = new Date(`2000-01-01T${currentSession.start}`);
+
+                let foundTime = null;
+                let minDiff = Infinity;
+                let bestStart = null;
+                let checkTime = new Date(workStart);
+                while (checkTime < workEnd) {
+                    const proposedStartStr = `${String(checkTime.getHours()).padStart(2, '0')}:${String(checkTime.getMinutes()).padStart(2, '0')}`;
+                    const proposedEnd = new Date(checkTime);
+                    proposedEnd.setMinutes(proposedEnd.getMinutes() + originalDuration);
+                    const proposedEndStr = `${String(proposedEnd.getHours()).padStart(2, '0')}:${String(proposedEnd.getMinutes()).padStart(2, '0')}`;
+                    
+                    if (!hasConflict(otherEmp.sessions, proposedStartStr, proposedEndStr, -1)) {
+                         const timeDiff = Math.abs(checkTime.getTime() - sessionTime.getTime());
+                         if (timeDiff < minDiff) {
+                             minDiff = timeDiff;
+                             bestStart = proposedStartStr;
+                             foundTime = { start: proposedStartStr, end: proposedEndStr };
+                         }
+                    }
+                    checkTime.setMinutes(checkTime.getMinutes() + 15);
+                }
+                
+                if (foundTime) {
+                    addSolution(`Перенести на ${otherEmp.name} на ${foundTime.start}-${foundTime.end}`, () => {
+                        employeeData[employeeIndex].sessions.splice(sessionIndex, 1);
+                        employeeData[colleagueIndex].sessions.push({
+                            start: foundTime.start,
+                            end: foundTime.end,
+                            replacement: originalReplacement,
+                            conflict: false,
+                            resolved: true
+                        });
+                        saveDataAndRender();
+                        showCustomAlert(`Слот ${originalReplacement} успешно перенесен на ${otherEmp.name} на ${foundTime.start}-${foundTime.end}.`);
+                    });
+                }
+            });
+
+            sessionOptionsModal.classList.add('open');
+        }
+
+        document.querySelectorAll('.modal-close-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                shareModal.classList.remove('open');
+                loadDataModal.classList.remove('open');
+                sessionOptionsModal.classList.remove('open');
+                avatarModal.classList.remove('open');
+            });
+        });
+
+        shareImageBtn.addEventListener('click', () => {
+            if (currentEmployeeIndex !== null) {
+                shareAsImage(currentEmployeeIndex);
+            }
+        });
+
+        shareTextBtn.addEventListener('click', () => {
+            if (currentEmployeeIndex !== null) {
+                shareAsText(currentEmployeeIndex);
+            }
+        });
+
+        addEmployeeBtn.addEventListener('click', () => {
+            const newEmployee = {
+                name: "Новый сотрудник",
+                position: "Должность",
+                image: "НС",
+                sessions: []
+            };
+            employeeData.push(newEmployee);
+            saveDataAndRender();
+        });
+
+        clearAllBtn.addEventListener('click', () => {
+            const confirmationPopup = document.createElement('div');
+            confirmationPopup.style.cssText = `
+                position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                z-index: 1000; text-align: center;
+            `;
+            confirmationPopup.innerHTML = `
+                <p>Вы уверены, что хотите очистить все данные?</p>
+                <div style="margin-top: 15px;">
+                    <button id="confirm-yes" style="padding: 8px 16px; margin: 0 5px; border-radius: 5px; border: 1px solid #ccc; cursor: pointer;">Да</button>
+                    <button id="confirm-no" style="padding: 8px 16px; margin: 0 5px; border-radius: 5px; border: 1px solid #ccc; cursor: pointer;">Нет</button>
+                </div>
+            `;
+            document.body.appendChild(confirmationPopup);
+
+            document.getElementById('confirm-yes').onclick = () => {
+                localStorage.removeItem('employeeSchedules');
+                employeeData = [];
+                saveDataAndRender();
+                confirmationPopup.remove();
+            };
+            document.getElementById('confirm-no').onclick = () => {
+                confirmationPopup.remove();
+            };
+        });
+
+        // Avatar modal functionality
+        fileUpload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    employeeData[currentEmployeeIndex].image = event.target.result;
+                    saveDataAndRender();
+                    avatarModal.classList.remove('open');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        emojiOption.addEventListener('click', () => {
+            document.querySelectorAll('.avatar-modal-option').forEach(el => el.classList.remove('active'));
+            emojiOption.classList.add('active');
+            emojiInput.style.display = 'block';
+            emojiInput.focus();
+        });
+        
+        emojiInput.addEventListener('change', () => {
+            const emoji = emojiInput.value.trim();
+            if (emoji) {
+                employeeData[currentEmployeeIndex].image = emoji;
+                saveDataAndRender();
+                avatarModal.classList.remove('open');
+                emojiInput.style.display = 'none';
+                emojiInput.value = '';
+            }
+        });
+
+        initialsOption.addEventListener('click', () => {
+            document.querySelectorAll('.avatar-modal-option').forEach(el => el.classList.remove('active'));
+            initialsOption.classList.add('active');
+            const initials = getInitials(employeeData[currentEmployeeIndex].name);
+            employeeData[currentEmployeeIndex].image = initials;
+            saveDataAndRender();
+            avatarModal.classList.remove('open');
+            emojiInput.style.display = 'none';
+            emojiInput.value = '';
+        });
+
+        // Theme toggle functionality
+        themeToggleBtn.addEventListener('click', () => {
+            body.classList.toggle('dark-theme');
+            const isDark = body.classList.contains('dark-theme');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            body.classList.add('dark-theme');
+        }
+
+        renderEmployees();
+    });
+</script>
+
+</body>
+</html>
